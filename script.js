@@ -31,7 +31,7 @@ async function fetchBooks(page = 1, url = `${baseUrl}${page}`) {
         totalPages = Math.ceil(data.count / 32);  // Assuming 32 books per page
 
         displayBooks();
-        createPagination(totalPages);
+        createPagination(totalPages, currentPage); // Create pagination with ellipses
     } catch (error) {
         console.error("Error fetching books:", error);
     } finally {
@@ -77,19 +77,56 @@ function attachWishlistEvents() {
     });
 }
 
-// Create numbered pagination buttons
-function createPagination(totalPages) {
+// Create pagination with ellipses
+function createPagination(totalPages, currentPage) {
     paginationContainer.innerHTML = ''; // Clear previous pagination
-    for (let i = 1; i <= totalPages; i++) {
-        const pageBtn = document.createElement('button');
-        pageBtn.textContent = i;
-        pageBtn.classList.add('page-btn');
-        if (i === currentPage) {
-            pageBtn.classList.add('active');
-        }
-        pageBtn.addEventListener('click', () => goToPage(i)); // Add event listener to each button
+    const maxVisiblePages = 5; // Number of pages to show around the current page
+
+    // Add "First" page button
+    if (currentPage > 1) {
+        const firstPageBtn = createPageButton(1);
+        paginationContainer.appendChild(firstPageBtn);
+    }
+
+    // Add "..." before current pages if needed
+    if (currentPage > maxVisiblePages) {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        paginationContainer.appendChild(ellipsis);
+    }
+
+    // Show pages around the current page
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = createPageButton(i);
         paginationContainer.appendChild(pageBtn);
     }
+
+    // Add "..." after current pages if needed
+    if (endPage < totalPages - 1) {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        paginationContainer.appendChild(ellipsis);
+    }
+
+    // Add "Last" page button
+    if (currentPage < totalPages) {
+        const lastPageBtn = createPageButton(totalPages);
+        paginationContainer.appendChild(lastPageBtn);
+    }
+}
+
+// Helper function to create individual page buttons
+function createPageButton(page) {
+    const pageBtn = document.createElement('button');
+    pageBtn.textContent = page;
+    pageBtn.classList.add('page-btn');
+    if (page === currentPage) {
+        pageBtn.classList.add('active');
+    }
+    pageBtn.addEventListener('click', () => goToPage(page)); // Add event listener to each button
+    return pageBtn;
 }
 
 // Go to a specific page when clicked

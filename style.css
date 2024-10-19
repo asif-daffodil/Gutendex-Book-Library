@@ -121,12 +121,12 @@ nav ul li a {
     margin: 20px 0;
 }
 
-.pagination button {
+.pagination button, .pagination span {
     padding: 10px 15px;
     margin: 5px;
     background-color: #ff6f61;
     border: none;
-    color: white;
+    color: #000;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -138,6 +138,11 @@ nav ul li a {
 
 .pagination button:hover {
     background-color: #ff4444;
+}
+
+.pagination span {
+    background-color: transparent;
+    cursor: default;
 }
 
 
