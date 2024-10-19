@@ -2,17 +2,14 @@
 const bookList = document.getElementById('bookList');
 const searchBar = document.getElementById('searchBar');
 const genreFilter = document.getElementById('genreFilter');
-const prevPageBtn = document.getElementById('prevPage');
-const nextPageBtn = document.getElementById('nextPage');
-const pageNumber = document.getElementById('pageNumber');
+const paginationContainer = document.querySelector('.pagination'); // Pagination container
 const loadingSpinner = document.getElementById('loading'); // Loading spinner element
 
 let currentPage = 1;
-let nextPageUrl = null;
-let prevPageUrl = null;
+let totalPages = 1; // Total number of pages
 let booksData = [];
 let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-const baseUrl = 'https://gutendex.com/books/?';
+const baseUrl = 'https://gutendex.com/books/?page=';
 
 // Show the loading spinner
 function showLoading() {
@@ -25,20 +22,16 @@ function hideLoading() {
 }
 
 // Fetch books from the API
-async function fetchBooks(url = baseUrl) {
+async function fetchBooks(page = 1, url = `${baseUrl}${page}`) {
     try {
         showLoading();  // Show loading spinner while fetching
         const response = await fetch(url);
         const data = await response.json();
         booksData = data.results;
-        nextPageUrl = data.next;  // Store the next page URL
-        prevPageUrl = data.previous;  // Store the previous page URL
-
-        // Enable/disable pagination buttons based on availability of pages
-        prevPageBtn.disabled = !prevPageUrl;
-        nextPageBtn.disabled = !nextPageUrl;
+        totalPages = Math.ceil(data.count / 32);  // Assuming 32 books per page
 
         displayBooks();
+        createPagination(totalPages);
     } catch (error) {
         console.error("Error fetching books:", error);
     } finally {
@@ -84,36 +77,41 @@ function attachWishlistEvents() {
     });
 }
 
-// Pagination controls - Previous Page
-prevPageBtn.addEventListener('click', () => {
-    if (prevPageUrl) {
-        fetchBooks(prevPageUrl);  // Fetch the previous page using prevPageUrl
-        currentPage--;  // Decrement the current page count
-        pageNumber.textContent = currentPage;
+// Create numbered pagination buttons
+function createPagination(totalPages) {
+    paginationContainer.innerHTML = ''; // Clear previous pagination
+    for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        pageBtn.classList.add('page-btn');
+        if (i === currentPage) {
+            pageBtn.classList.add('active');
+        }
+        pageBtn.addEventListener('click', () => goToPage(i)); // Add event listener to each button
+        paginationContainer.appendChild(pageBtn);
     }
-});
+}
 
-// Pagination controls - Next Page
-nextPageBtn.addEventListener('click', () => {
-    if (nextPageUrl) {
-        fetchBooks(nextPageUrl);  // Fetch the next page using nextPageUrl
-        currentPage++;  // Increment the current page count
-        pageNumber.textContent = currentPage;
+// Go to a specific page when clicked
+function goToPage(page) {
+    if (page !== currentPage) {
+        currentPage = page;
+        fetchBooks(currentPage); // Fetch the books for the selected page
     }
-});
+}
 
 // Real-time search by title
 searchBar.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
     const searchUrl = `${baseUrl}search=${encodeURIComponent(searchTerm)}`;
-    fetchBooks(searchUrl);
+    fetchBooks(currentPage, searchUrl);
 });
 
 // Filter by genre
 genreFilter.addEventListener('change', (e) => {
     const genre = e.target.value;
     const genreUrl = genre ? `${baseUrl}topic=${encodeURIComponent(genre)}` : baseUrl;
-    fetchBooks(genreUrl);
+    fetchBooks(currentPage, genreUrl);
 });
 
 // Initialize the page with the first set of books
