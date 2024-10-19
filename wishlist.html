@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <h1>Wishlist</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="wishlist.html">Wishlist</a></li>
+        </ul>
+    </nav>
+
+    <div id="wishlistBooks" class="book-list"></div>
+
+    <script>
+        const wishlistBooks = document.getElementById('wishlistBooks');
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+        async function fetchWishlistBooks() {
+            for (let id of wishlist) {
+                const response = await fetch(`https://gutendex.com/books/${id}`);
+                const book = await response.json();
+                const card = `
+                    <div class="book-card">
+                        <img src="${book.formats['image/jpeg']}" alt="${book.title}">
+                        <h3>${book.title}</h3>
+                        <p>Author: ${book.authors.map(author => author.name).join(', ')}</p>
+                    </div>
+                `;
+                wishlistBooks.innerHTML += card;
+            }
+        }
+
+        fetchWishlistBooks();
+    </script>
+</body>
+</html>

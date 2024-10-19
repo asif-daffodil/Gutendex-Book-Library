@@ -1,0 +1,183 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+nav {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+nav h1 {
+    margin: 0;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.controls {
+    padding: 20px;
+    text-align: center;
+}
+
+.controls input, .controls select {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.book-list {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+    padding: 20px;
+}
+
+.book-card {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow with prefixes */
+    -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    -webkit-transition: -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease; /* Smooth hover effect */
+    -moz-transition: -moz-transform 0.3s ease, -moz-box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-card:hover {
+    -webkit-transform: translateY(-5px);
+    -moz-transform: translateY(-5px);
+    transform: translateY(-5px); /* Slight lift on hover */
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hover shadow with prefixes */
+    -moz-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.book-card img {
+    max-width: 100%;
+    height: 250px;
+    -o-object-fit: cover;
+    -webkit-object-fit: cover;
+    object-fit: cover; /* Maintain aspect ratio for images */
+    border-radius: 5px;
+}
+
+.book-card h3 {
+    font-size: 16px;
+    margin: 10px 0;
+    color: #333;
+}
+
+.book-card p {
+    font-size: 14px;
+    color: #777;
+}
+
+.book-card button {
+    background-color: #ff6f61;
+    border: none;
+    padding: 8px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-transition: background-color 0.3s ease;
+    -moz-transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+
+.book-card button.liked {
+    background-color: #ff4444;
+}
+
+.book-card button:hover {
+    background-color: #ff3333;
+}
+
+.pagination {
+    text-align: center;
+    margin: 20px;
+}
+
+.pagination button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #ff6f61;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-transition: background-color 0.3s ease;
+    -moz-transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+    background-color: #ff4444;
+}
+
+@media (max-width: 768px) {
+    .controls input, .controls select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .book-list {
+        grid-template-columns: 1fr; /* Single-column layout on smaller screens */
+    }
+
+    .book-card {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff6f61;
+}
+
+/* Optional fancier spinner */
+.loading-spinner:after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #ff6f61;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
