@@ -118,25 +118,28 @@ nav ul li a {
 
 .pagination {
     text-align: center;
-    margin: 20px;
+    margin: 20px 0;
 }
 
 .pagination button {
-    padding: 10px 20px;
+    padding: 10px 15px;
     margin: 5px;
     background-color: #ff6f61;
     border: none;
     color: white;
     border-radius: 5px;
     cursor: pointer;
-    -webkit-transition: background-color 0.3s ease;
-    -moz-transition: background-color 0.3s ease;
     transition: background-color 0.3s ease;
+}
+
+.pagination button.active {
+    background-color: #ff4444;
 }
 
 .pagination button:hover {
     background-color: #ff4444;
 }
+
 
 @media (max-width: 768px) {
     .controls input, .controls select {
