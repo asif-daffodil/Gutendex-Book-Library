@@ -7,9 +7,8 @@ const loadingSpinner = document.getElementById('loading'); // Loading spinner el
 
 let currentPage = 1;
 let totalPages = 1; // Total number of pages
-let booksData = [];
 let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-const baseUrl = 'https://gutendex.com/books/?page=';
+const baseUrl = 'https://gutendex.com/books/';
 
 // Show the loading spinner
 function showLoading() {
@@ -21,17 +20,16 @@ function hideLoading() {
     loadingSpinner.style.display = 'none';
 }
 
-// Fetch books from the API
-async function fetchBooks(page = 1, url = `${baseUrl}${page}`) {
+// Fetch books per page
+async function fetchBooks(page = 1, query = '') {
     try {
         showLoading();  // Show loading spinner while fetching
-        const response = await fetch(url);
+        const response = await fetch(`${baseUrl}?page=${page}${query}`);
         const data = await response.json();
-        booksData = data.results;
-        totalPages = Math.ceil(data.count / 32);  // Assuming 32 books per page
+        totalPages = Math.ceil(data.count / 32);  // Calculate total pages based on the count
 
-        displayBooks();
-        createPagination(totalPages, currentPage); // Create pagination with ellipses
+        displayBooks(data.results);
+        createPagination(totalPages, currentPage); // Create pagination dynamically
     } catch (error) {
         console.error("Error fetching books:", error);
     } finally {
@@ -40,9 +38,9 @@ async function fetchBooks(page = 1, url = `${baseUrl}${page}`) {
 }
 
 // Display books in the DOM
-function displayBooks() {
+function displayBooks(books) {
     bookList.innerHTML = '';  // Clear the book list
-    booksData.forEach(book => {
+    books.forEach(book => {
         const isLiked = wishlist.includes(book.id);
         const genres = book.bookshelves.join(', ');
         const card = `
@@ -72,7 +70,7 @@ function attachWishlistEvents() {
                 wishlist.push(bookId);
             }
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            displayBooks();
+            displayBooks(booksData);
         });
     });
 }
@@ -82,36 +80,35 @@ function createPagination(totalPages, currentPage) {
     paginationContainer.innerHTML = ''; // Clear previous pagination
     const maxVisiblePages = 5; // Number of pages to show around the current page
 
-    // Add "First" page button
-    if (currentPage > 1) {
-        const firstPageBtn = createPageButton(1);
-        paginationContainer.appendChild(firstPageBtn);
-    }
+    // Always show "Page 1"
+    const firstPageBtn = createPageButton(1);
+    paginationContainer.appendChild(firstPageBtn);
 
-    // Add "..." before current pages if needed
-    if (currentPage > maxVisiblePages) {
+    // Add "..." before the current pages if the gap is large (e.g., more than 2 pages between 1 and currentPage)
+    if (currentPage > 3) {
         const ellipsis = document.createElement('span');
         ellipsis.textContent = '...';
         paginationContainer.appendChild(ellipsis);
     }
 
-    // Show pages around the current page
-    const startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, currentPage + 2);
+    // Show pages around the current page (2 pages before and after)
+    const startPage = Math.max(2, currentPage - 2); // Start from page 2 to avoid duplicating page 1
+    const endPage = Math.min(totalPages - 1, currentPage + 2); // End before the last page to avoid duplicating
+
     for (let i = startPage; i <= endPage; i++) {
         const pageBtn = createPageButton(i);
         paginationContainer.appendChild(pageBtn);
     }
 
-    // Add "..." after current pages if needed
-    if (endPage < totalPages - 1) {
+    // Add "..." after the current pages if needed
+    if (currentPage < totalPages - 3) {
         const ellipsis = document.createElement('span');
         ellipsis.textContent = '...';
         paginationContainer.appendChild(ellipsis);
     }
 
-    // Add "Last" page button
-    if (currentPage < totalPages) {
+    // Always show the "Last" page
+    if (totalPages > 1) {
         const lastPageBtn = createPageButton(totalPages);
         paginationContainer.appendChild(lastPageBtn);
     }
@@ -129,6 +126,7 @@ function createPageButton(page) {
     return pageBtn;
 }
 
+
 // Go to a specific page when clicked
 function goToPage(page) {
     if (page !== currentPage) {
@@ -140,14 +138,14 @@ function goToPage(page) {
 // Real-time search by title
 searchBar.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    const searchUrl = `${baseUrl}search=${encodeURIComponent(searchTerm)}`;
+    const searchUrl = `&search=${encodeURIComponent(searchTerm)}`;
     fetchBooks(currentPage, searchUrl);
 });
 
 // Filter by genre
 genreFilter.addEventListener('change', (e) => {
     const genre = e.target.value;
-    const genreUrl = genre ? `${baseUrl}topic=${encodeURIComponent(genre)}` : baseUrl;
+    const genreUrl = genre ? `&topic=${encodeURIComponent(genre)}` : '';
     fetchBooks(currentPage, genreUrl);
 });
 

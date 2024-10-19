@@ -126,7 +126,7 @@ nav ul li a {
     margin: 5px;
     background-color: #ff6f61;
     border: none;
-    color: #000;
+    color: white;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -143,6 +143,7 @@ nav ul li a {
 .pagination span {
     background-color: transparent;
     cursor: default;
+    color: #000;
 }
 
 
