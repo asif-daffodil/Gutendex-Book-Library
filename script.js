@@ -75,7 +75,7 @@ function displayBooks(books) {
             <div class="book-card">
                 <!-- Link to book detail page using the book's ID -->
                 <a href="book.html?id=${book.id}">
-                    <img src="${bookCover}" alt="${book.title}" class="lazyload">
+                    <img src="${bookCover}" alt="${book.title}" class="lazyload" loading="lazy">
                     <h3>${book.title}</h3>
                 </a>
                 <p><strong>Author(s):</strong> ${authors}</p>
