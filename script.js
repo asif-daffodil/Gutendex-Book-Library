@@ -51,7 +51,7 @@ function displayBooks(books) {
 
         const card = `
             <div class="book-card">
-                <img src="${bookCover}" alt="${book.title}">
+                <img src="${bookCover}" class="lazyload" alt="${book.title}">
                 <h3>${book.title}</h3>
                 <p><strong>Author(s):</strong> ${authors}</p>
                 <p><strong>Genres:</strong> ${genres}</p>
@@ -66,6 +66,27 @@ function displayBooks(books) {
 
     attachWishlistEvents(); // Reattach event listeners for wishlist buttons
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const lazyImages = document.querySelectorAll(".lazyload");
+
+    const lazyLoad = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;  // Set the real image source
+                observer.unobserve(img);  // Stop observing this image
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(lazyLoad);
+
+    lazyImages.forEach(img => {
+        observer.observe(img);
+    });
+});
+
 
 
 // Add event listeners to wishlist buttons
