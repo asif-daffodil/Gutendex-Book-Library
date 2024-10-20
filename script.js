@@ -73,17 +73,27 @@ function attachWishlistEvents() {
     const buttons = document.querySelectorAll('.wishlist-btn');
     buttons.forEach(button => {
         button.addEventListener('click', (e) => {
-            const bookId = parseInt(e.target.dataset.id);
+            const bookId = parseInt(e.target.dataset.id);  // Get book ID from button
+
+            // Toggle wishlist state
             if (wishlist.includes(bookId)) {
+                // Remove from wishlist
                 wishlist = wishlist.filter(id => id !== bookId);
+                e.target.textContent = '♡';  // Change the button icon to "unliked"
+                e.target.classList.remove('liked');  // Remove 'liked' class
             } else {
+                // Add to wishlist
                 wishlist.push(bookId);
+                e.target.textContent = '❤️';  // Change the button icon to "liked"
+                e.target.classList.add('liked');  // Add 'liked' class
             }
+
+            // Save updated wishlist to localStorage
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
-            displayBooks(booksData);
         });
     });
 }
+
 
 // Create pagination with ellipses
 function createPagination(totalPages, currentPage) {
