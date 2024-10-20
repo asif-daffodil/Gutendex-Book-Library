@@ -20,16 +20,39 @@ function hideLoading() {
     loadingSpinner.style.display = 'none';
 }
 
-// Fetch books per page
+// Load preferences from localStorage (if any)
+function loadPreferences() {
+    const savedSearch = localStorage.getItem('searchTerm');
+    const savedGenre = localStorage.getItem('selectedGenre');
+
+    // Set search input and genre filter based on saved preferences
+    if (savedSearch) {
+        searchBar.value = savedSearch; // Set search bar to saved search term
+    }
+    if (savedGenre) {
+        genreFilter.value = savedGenre; // Set genre filter to saved genre
+    }
+
+    // Fetch books based on the saved preferences
+    fetchBooks(currentPage, `&search=${encodeURIComponent(savedSearch || '')}&topic=${encodeURIComponent(savedGenre || '')}`);
+}
+
+// Save preferences to localStorage
+function savePreferences() {
+    localStorage.setItem('searchTerm', searchBar.value);  // Save search term
+    localStorage.setItem('selectedGenre', genreFilter.value);  // Save selected genre
+}
+
+// Fetch books with search and filter preferences
 async function fetchBooks(page = 1, query = '') {
     try {
         showLoading();  // Show loading spinner while fetching
-        const response = await fetch(`${baseUrl}?page=${page}${query}`);
+        const response = await fetch(`https://gutendex.com/books/?page=${page}${query}`);
         const data = await response.json();
-        totalPages = Math.ceil(data.count / 32);  // Calculate total pages based on the count
 
-        displayBooks(data.results);
-        createPagination(totalPages, currentPage); // Create pagination dynamically
+        displayBooks(data.results);  // Display only the books for this page
+        totalPages = Math.ceil(data.count / 32);  // Calculate total pages
+        createPagination(totalPages, currentPage);  // Update pagination
     } catch (error) {
         console.error("Error fetching books:", error);
     } finally {
@@ -52,7 +75,7 @@ function displayBooks(books) {
             <div class="book-card">
                 <!-- Link to book detail page using the book's ID -->
                 <a href="book.html?id=${book.id}">
-                    <img src="${bookCover}" alt="${book.title}">
+                    <img src="${bookCover}" alt="${book.title}" class="lazyload">
                     <h3>${book.title}</h3>
                 </a>
                 <p><strong>Author(s):</strong> ${authors}</p>
@@ -69,7 +92,7 @@ function displayBooks(books) {
     attachWishlistEvents(); // Reattach event listeners for wishlist buttons
 }
 
-
+// Lazy loading for images
 document.addEventListener("DOMContentLoaded", function() {
     const lazyImages = document.querySelectorAll(".lazyload");
 
@@ -89,8 +112,6 @@ document.addEventListener("DOMContentLoaded", function() {
         observer.observe(img);
     });
 });
-
-
 
 // Add event listeners to wishlist buttons
 function attachWishlistEvents() {
@@ -117,7 +138,6 @@ function attachWishlistEvents() {
         });
     });
 }
-
 
 // Create pagination with ellipses
 function createPagination(totalPages, currentPage) {
@@ -170,7 +190,6 @@ function createPageButton(page) {
     return pageBtn;
 }
 
-
 // Go to a specific page when clicked
 function goToPage(page) {
     if (page !== currentPage) {
@@ -179,19 +198,21 @@ function goToPage(page) {
     }
 }
 
-// Real-time search by title
+// Real-time search by title and save search term
 searchBar.addEventListener('input', (e) => {
+    savePreferences(); // Save search preferences
     const searchTerm = e.target.value.toLowerCase();
-    const searchUrl = `&search=${encodeURIComponent(searchTerm)}`;
+    const searchUrl = `&search=${encodeURIComponent(searchTerm)}&topic=${encodeURIComponent(genreFilter.value)}`;
     fetchBooks(currentPage, searchUrl);
 });
 
-// Filter by genre
+// Filter by genre and save selected genre
 genreFilter.addEventListener('change', (e) => {
+    savePreferences(); // Save filter preferences
     const genre = e.target.value;
-    const genreUrl = genre ? `&topic=${encodeURIComponent(genre)}` : '';
-    fetchBooks(currentPage, genreUrl); // Fetch books based on the selected genre
+    const genreUrl = `&search=${encodeURIComponent(searchBar.value)}&topic=${encodeURIComponent(genre)}`;
+    fetchBooks(currentPage, genreUrl);
 });
 
-// Initialize the page with the first set of books
-fetchBooks();
+// Initialize the page with preferences
+loadPreferences();
