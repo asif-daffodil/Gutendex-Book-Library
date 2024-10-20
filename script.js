@@ -42,8 +42,11 @@ function displayBooks(books) {
     bookList.innerHTML = '';  // Clear the book list
     books.forEach(book => {
         const isLiked = wishlist.includes(book.id);
-        const genres = book.bookshelves.join(', '); // Assuming bookshelves are genres
-        const authors = book.authors.map(author => author.name).join(', '); // Multiple authors handling
+        // Clean genres by removing "Browsing:" prefix
+        const genres = book.bookshelves
+            .map(genre => genre.replace(/Browsing:\s*/g, '')) // Remove "Browsing:" from genre names
+            .join(', ');
+        const authors = book.authors.map(author => author.name).join(', '); // Handle multiple authors
         const bookCover = book.formats['image/jpeg'] || ''; // Fetch the cover image if available
 
         const card = `
@@ -52,7 +55,7 @@ function displayBooks(books) {
                 <h3>${book.title}</h3>
                 <p><strong>Author(s):</strong> ${authors}</p>
                 <p><strong>Genres:</strong> ${genres}</p>
-                <p><strong>ID:</strong> ${book.id}</p> <!-- Display the Book ID -->
+                <p><strong>ID:</strong> ${book.id}</p>
                 <button class="wishlist-btn ${isLiked ? 'liked' : ''}" data-id="${book.id}">
                     ${isLiked ? '❤️' : '♡'}
                 </button>
@@ -63,6 +66,7 @@ function displayBooks(books) {
 
     attachWishlistEvents(); // Reattach event listeners for wishlist buttons
 }
+
 
 // Add event listeners to wishlist buttons
 function attachWishlistEvents() {
