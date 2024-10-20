@@ -187,7 +187,7 @@ searchBar.addEventListener('input', (e) => {
 genreFilter.addEventListener('change', (e) => {
     const genre = e.target.value;
     const genreUrl = genre ? `&topic=${encodeURIComponent(genre)}` : '';
-    fetchBooks(currentPage, genreUrl);
+    fetchBooks(currentPage, genreUrl); // Fetch books based on the selected genre
 });
 
 // Initialize the page with the first set of books
