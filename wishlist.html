@@ -27,8 +27,8 @@
                 const book = await response.json();
                 const card = `
                     <div class="book-card">
-                        <img src="${book.formats['image/jpeg']}" alt="${book.title}">
-                        <h3>${book.title}</h3>
+                        <img src="${book.formats['image/jpeg']}" alt="${book.title}" loading="lazy">
+                        <a href="./book.html?id=${book.id}"><h3>${book.title}</h3></a>
                         <p>Author: ${book.authors.map(author => author.name).join(', ')}</p>
                     </div>
                 `;
