@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li> <!-- Back to Home Button -->
+        </ul>
+    </nav>
+
+    <div id="bookDetails" class="book-details">
+        <p>Loading book details...</p>
+    </div>
+
+    <script>
+        // Get the book ID from the URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id');
+
+        // Load wishlist from localStorage
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+        // Check if the book is in the wishlist
+        const isBookInWishlist = (id) => wishlist.includes(id);
+
+        // Toggle the book in the wishlist
+        function toggleWishlist(bookId) {
+            if (isBookInWishlist(bookId)) {
+                // Remove from wishlist
+                wishlist = wishlist.filter(id => id !== bookId);
+                document.getElementById('wishlistBtn').textContent = '♡ Add to Wishlist';
+            } else {
+                // Add to wishlist
+                wishlist.push(bookId);
+                document.getElementById('wishlistBtn').textContent = '❤️ Remove from Wishlist';
+            }
+
+            // Save updated wishlist to localStorage
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        }
+
+        // Fetch and display book details using the book ID
+        async function fetchBookDetails() {
+            try {
+                const response = await fetch(`https://gutendex.com/books/${bookId}`);
+                const book = await response.json();
+
+                const genres = book.bookshelves.join(', ');
+                const authors = book.authors.map(author => `${author.name} (${author.birth_year || 'N/A'} - ${author.death_year || 'N/A'})`).join(', ');
+                const bookCover = book.formats['image/jpeg'] || '';
+                const languages = book.languages.join(', ');
+                const subjects = book.subjects.join(', ');
+                const copyrightStatus = book.copyright !== null ? (book.copyright ? "Yes" : "No") : "Unknown";
+
+                // Build the book details UI
+                document.getElementById('bookDetails').innerHTML = `
+                    <div class="book-detail-card">
+                        <img src="${bookCover}" alt="${book.title}">
+                        <h2>${book.title}</h2>
+                        <p><strong>Author(s):</strong> ${authors}</p>
+                        <p><strong>Genres:</strong> ${genres}</p>
+                        <p><strong>Download Count:</strong> ${book.download_count}</p>
+                        <p><strong>ID:</strong> ${book.id}</p>
+                        <p><strong>Language(s):</strong> ${languages}</p>
+                        <p><strong>Subjects:</strong> ${subjects}</p>
+                        <p><strong>Copyright:</strong> ${copyrightStatus}</p>
+                        <!-- Wishlist button -->
+                        <button id="wishlistBtn">${isBookInWishlist(parseInt(bookId)) ? '❤️ Remove from Wishlist' : '♡ Add to Wishlist'}</button>
+                        <!-- Back to home page -->
+                        <a href="index.html"><button>Back to Home</button></a>
+                    </div>
+                `;
+
+                // Attach event listener to wishlist button
+                document.getElementById('wishlistBtn').addEventListener('click', () => {
+                    toggleWishlist(parseInt(bookId));
+                });
+            } catch (error) {
+                console.error("Error fetching book details:", error);
+                document.getElementById('bookDetails').innerHTML = `<p>Error loading book details.</p>`;
+            }
+        }
+
+        // Fetch and display the book details on page load
+        fetchBookDetails();
+    </script>
+</body>
+</html>

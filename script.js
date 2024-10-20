@@ -42,17 +42,19 @@ function displayBooks(books) {
     bookList.innerHTML = '';  // Clear the book list
     books.forEach(book => {
         const isLiked = wishlist.includes(book.id);
-        // Clean genres by removing "Browsing:" prefix
         const genres = book.bookshelves
-            .map(genre => genre.replace(/Browsing:\s*/g, '')) // Remove "Browsing:" from genre names
+            .map(genre => genre.replace(/Browsing:\s*/g, '')) // Clean "Browsing:" prefix from genre
             .join(', ');
         const authors = book.authors.map(author => author.name).join(', '); // Handle multiple authors
         const bookCover = book.formats['image/jpeg'] || ''; // Fetch the cover image if available
 
         const card = `
             <div class="book-card">
-                <img src="${bookCover}" class="lazyload" alt="${book.title}">
-                <h3>${book.title}</h3>
+                <!-- Link to book detail page using the book's ID -->
+                <a href="book.html?id=${book.id}">
+                    <img src="${bookCover}" alt="${book.title}">
+                    <h3>${book.title}</h3>
+                </a>
                 <p><strong>Author(s):</strong> ${authors}</p>
                 <p><strong>Genres:</strong> ${genres}</p>
                 <p><strong>ID:</strong> ${book.id}</p>
@@ -66,6 +68,7 @@ function displayBooks(books) {
 
     attachWishlistEvents(); // Reattach event listeners for wishlist buttons
 }
+
 
 document.addEventListener("DOMContentLoaded", function() {
     const lazyImages = document.querySelectorAll(".lazyload");
