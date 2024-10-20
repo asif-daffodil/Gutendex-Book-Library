@@ -42,20 +42,26 @@ function displayBooks(books) {
     bookList.innerHTML = '';  // Clear the book list
     books.forEach(book => {
         const isLiked = wishlist.includes(book.id);
-        const genres = book.bookshelves.join(', ');
+        const genres = book.bookshelves.join(', '); // Assuming bookshelves are genres
+        const authors = book.authors.map(author => author.name).join(', '); // Multiple authors handling
+        const bookCover = book.formats['image/jpeg'] || ''; // Fetch the cover image if available
+
         const card = `
             <div class="book-card">
-                <img src="${book.formats['image/jpeg'] || ''}" alt="${book.title}">
+                <img src="${bookCover}" alt="${book.title}">
                 <h3>${book.title}</h3>
-                <p>Author: ${book.authors.map(author => author.name).join(', ')}</p>
-                <p>Genres: ${genres}</p>
-                <button class="wishlist-btn ${isLiked ? 'liked' : ''}" data-id="${book.id}">${isLiked ? '❤️' : '♡'}</button>
+                <p><strong>Author(s):</strong> ${authors}</p>
+                <p><strong>Genres:</strong> ${genres}</p>
+                <p><strong>ID:</strong> ${book.id}</p> <!-- Display the Book ID -->
+                <button class="wishlist-btn ${isLiked ? 'liked' : ''}" data-id="${book.id}">
+                    ${isLiked ? '❤️' : '♡'}
+                </button>
             </div>
         `;
         bookList.innerHTML += card;
     });
 
-    attachWishlistEvents();
+    attachWishlistEvents(); // Reattach event listeners for wishlist buttons
 }
 
 // Add event listeners to wishlist buttons
